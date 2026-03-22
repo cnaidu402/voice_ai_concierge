@@ -7,13 +7,15 @@ An end-to-end, ultra-low latency voice AI agent built with FastAPI, WebSockets, 
 ```mermaid
 graph TD
     User((User Voice)) -->|Raw Audio| Frontend[Browser MediaRecorder]
-    Frontend <-->|WebSockets| Backend[FastAPI Server]
+    Frontend -->|WebSockets| Backend[FastAPI Server]
+    Backend -->|WebSockets| Frontend
     
-    subgraph "Backend Orchestration (Python)"
+    subgraph Backend_Orchestration ["Backend Orchestration (Python)"]
         Backend -->|Audio Stream| Deepgram[Deepgram Nova-3 ASR]
         Deepgram -->|Text Transcript| Claude[Claude 3.5 Haiku LLM]
         
-        Claude <-->|Tool Calling| DB[(Local Python Tool/DB)]
+        Claude -->|Tool Queries| DB[(Local Python Tool/DB)]
+        DB -->|Tool Results| Claude
         
         Claude -->|Text Stream chunks| ElevenLabs[ElevenLabs TTS]
         ElevenLabs -->|Audio Bytes| Backend
